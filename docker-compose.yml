@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # API Backend
+  api:
+    build: .
+    container_name: jarvis-api
+    ports:
+      - "8000:8000"
+    environment:
+      - PINECONE_API_KEY=${PINECONE_API_KEY}
+      - PINECONE_ENVIRONMENT=${PINECONE_ENVIRONMENT}
+      - PINECONE_INDEX_NAME=${PINECONE_INDEX_NAME}
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama2}
+    volumes:
+      - ./.env:/app/.env:ro
+    command: python api.py
+    depends_on:
+      - ollama
+    networks:
+      - jarvis-network
+    restart: unless-stopped
+
+  # Streamlit UI
+  ui:
+    build: .
+    container_name: jarvis-ui
+    ports:
+      - "8501:8501"
+    environment:
+      - API_BASE_URL=http://api:8000
+    command: streamlit run streamlit_app.py --server.address=0.0.0.0
+    depends_on:
+      - api
+    networks:
+      - jarvis-network
+    restart: unless-stopped
+
+  # Note: Ollama should be running on host machine
+  # Install with: curl -fsSL https://ollama.com/install.sh | sh
+  # Start with: ollama serve
+  # Pull model: ollama pull llama2
+
+networks:
+  jarvis-network:
+    driver: bridge
+
+# To use:
+# 1. Ensure Ollama is running on your host: ollama serve
+# 2. Create .env file with your credentials
+# 3. Run: docker-compose up -d
+# 4. Access UI at: http://localhost:8501
+# 5. Access API at: http://localhost:8000
