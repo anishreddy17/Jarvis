@@ -27,3 +27,7 @@ Thumbs.db
 # Local data
 *.db
 data/
+
+# Installers
+*.exe
+*.crdownload

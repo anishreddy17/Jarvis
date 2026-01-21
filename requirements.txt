@@ -18,6 +18,7 @@ streamlit>=1.30.0
 # Utilities
 numpy>=1.24.0
 python-multipart>=0.0.6
+requests>=2.31.0
 
 # Optional: Uncomment if you want to use langchain
 # langchain>=0.1.0
